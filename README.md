@@ -1,4 +1,7 @@
 # Affine transformation demonstration
+
+![screenshot](public/screenshot.png)
+
 ## Available Scripts
 
 In the project directory, you can run:
