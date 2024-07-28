@@ -14,9 +14,6 @@ const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
 }
 
 const App = () => {
-  const screenDimensions = {x: 0, y: 0, width: 640, height: 480};
-  const canvasDimensions = {x: 0, y: 0, width: 1000, height: 1000};
-
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pz = useRef(new PanZoom2D())
 
