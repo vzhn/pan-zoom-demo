@@ -1,6 +1,8 @@
-# Affine transformation demonstration
+# pan-zoom demo
 
 ![screenshot](public/screenshot.png)
+
+This is demonstration of pan-zoom mechanic implemented with HTML canvas, without affine transformation matrices.
 
 ## Available Scripts
 
