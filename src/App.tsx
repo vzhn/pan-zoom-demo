@@ -1,40 +1,24 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import './App.css';
-import {Rectangle, Scene} from "./Scene";
-import {PanZoom, Point} from "./PanZoom";
-import TransformVisualizer from "./TransformVisualizer";
+import {Point} from "./PanZoom";
 import {StyledCanvas} from "./StyledCanvas";
-const setupScene = () => {
-  const scene = new Scene()
-  scene.add(new Rectangle(0, 0, 100, 100))
-  return scene
+import {PanZoom2D} from "./transformation/PanZoom2D";
+import {drawRect} from "./misc/Geometry";
+
+const getZoomFactor = (ev: WheelEvent) => Math.pow(10, ev.deltaY / 2000.0);
+
+const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
+  const dpr = 1
+  const {left, top} = cv.getBoundingClientRect();
+  return {x: (ev.x - left) * dpr, y: (ev.y - top) * dpr}
 }
 
 const App = () => {
-  const scene = useRef(setupScene())
+  const screenDimensions = {x: 0, y: 0, width: 640, height: 480};
+  const canvasDimensions = {x: 0, y: 0, width: 1000, height: 1000};
+
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const pz = useRef(new PanZoom())
-
-  const [matrix, updateMatrix] = useState(pz.current.matrix)
-  const [mousePosition, updateMousePosition] = useState<Point>({x: 0, y: 0})
-  const [mouseProjectionPosition, updateMouseProjectionPosition] = useState<Point>({x: 0, y: 0})
-
-  const canvasCoordinates = useCallback((ev: MouseEvent): Point => {
-    const dpr = 1
-    const cv = canvasRef.current!
-    const boundingClientRect = cv.getBoundingClientRect();
-    const offsetX = boundingClientRect.left
-    const offsetY = boundingClientRect.top
-    return {x: (ev.x - offsetX) * dpr, y: (ev.y - offsetY) * dpr}
-  }, [])
-
-  const updateMouseCoordinates = useCallback((ev: MouseEvent) => {
-    const mousePos = canvasCoordinates(ev);
-    const mouseProjPos = pz.current.inverse(mousePos)
-
-    updateMousePosition(mousePos)
-    updateMouseProjectionPosition(mouseProjPos)
-  }, []);
+  const pz = useRef(new PanZoom2D())
 
   const paint = useCallback(() => {
     const canvas = canvasRef.current!;
@@ -44,16 +28,20 @@ const App = () => {
     context.clearRect(0, 0, canvas.width, canvas.height)
 
     context.setTransform(pz.current.matrix)
-    scene.current.draw(context)
+    drawRect(context, 0, 0, 100, 100)
+    drawRect(context, 900, 0, 100, 100)
+    drawRect(context, 400, 400, 100, 100)
+    drawRect(context, 0, 900, 100, 100)
+    drawRect(context, 900, 900, 100, 100)
   }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    const mouseDownListener = (ev: MouseEvent): void => {
+    const mouseDownListener = (): void => {
       const dragListener = (ev: MouseEvent) => {
         ev.preventDefault()
-        pz.current.translate(ev.movementX, ev.movementY)
-        updateMouseCoordinates(ev);
+        pz.current = pz.current.translateScreen(ev.movementX, ev.movementY)
+        // pz.current = fitIntoScreen(pz.current, screenDimensions, canvasDimensions)
         paint()
       };
       window.addEventListener('mousemove', dragListener)
@@ -65,15 +53,12 @@ const App = () => {
     const mouseListener = (ev: MouseEvent): void => {
       // preventing text selection
       ev.preventDefault()
-      updateMouseCoordinates(ev);
       paint()
     }
     const wheelListener = (ev: WheelEvent): void => {
       // preventing scrolling
       ev.preventDefault()
-
-      pz.current.zoomAt(canvasCoordinates(ev), ev.deltaY / 100.0)
-      updateMatrix(pz.current.matrix)
+      pz.current = pz.current.zoomAt(canvasCoordinates(canvasRef.current!, ev), getZoomFactor(ev))
       paint()
     }
 
@@ -92,14 +77,8 @@ const App = () => {
   return (
     <div className="App">
       <StyledCanvas width={640} height={480} ref={canvasRef}/>
-      <TransformVisualizer
-        matrix={matrix}
-        mousePosition={mousePosition}
-        mouseProjectionPosition={mouseProjectionPosition}
-      />
     </div>
   );
 };
 
 export default App;
-
