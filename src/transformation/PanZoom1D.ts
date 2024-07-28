@@ -25,7 +25,7 @@ export class PanZoom1D {
     return new PanZoom1D(1 / this.k, -this.b / this.k)
   }
 
-  public zoomAt(v: number, s: number) {
-    return new PanZoom1D(s * this.k,  v + s * (this.b - v))
+  public zoomAt(m: number, s: number) {
+    return new PanZoom1D(s * this.k,  m + s * (this.b - m))
   }
 }

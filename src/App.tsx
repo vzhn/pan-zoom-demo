@@ -10,7 +10,7 @@ const getZoomFactor = (ev: WheelEvent) => Math.pow(10, ev.deltaY / 2000.0);
 const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
   const dpr = 1
   const {left, top} = cv.getBoundingClientRect();
-  return {x: (ev.x - left) * dpr, y: (ev.y - top) * dpr}
+  return {mx: (ev.x - left) * dpr, my: (ev.y - top) * dpr}
 }
 
 const App = () => {

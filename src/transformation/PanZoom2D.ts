@@ -7,8 +7,8 @@ export class PanZoom2D {
     readonly ty: PanZoom1D = new PanZoom1D()
   ) { }
 
-  public apply({x, y}: Point): Point {
-    return {x: this.tx.apply(x), y: this.ty.apply(y)}
+  public apply({mx, my}: Point): Point {
+    return {mx: this.tx.apply(mx), my: this.ty.apply(my)}
   }
 
   public scale(sx: number, sy: number): PanZoom2D {
@@ -27,10 +27,10 @@ export class PanZoom2D {
     return new PanZoom2D(this.tx.inv(), this.ty.inv())
   }
 
-  public zoomAt({x, y}: Point, scale: number): PanZoom2D {
+  public zoomAt({mx, my}: Point, scale: number): PanZoom2D {
     return new PanZoom2D(
-      this.tx.zoomAt(x, scale),
-      this.ty.zoomAt(y, scale)
+      this.tx.zoomAt(mx, scale),
+      this.ty.zoomAt(my, scale)
     )
   }
 

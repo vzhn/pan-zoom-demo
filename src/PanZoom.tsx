@@ -1,6 +1,6 @@
 export interface Point {
-  x: number
-  y: number
+  mx: number
+  my: number
 }
 
 export class TransformationMatrix implements DOMMatrix2DInit {
@@ -13,8 +13,8 @@ export class TransformationMatrix implements DOMMatrix2DInit {
 
   public apply(p: Point): Point {
     return {
-      x: this.a * p.x + this.c * p.y + this.e,
-      y: this.b * p.x + this.d * p.y + this.f,
+      mx: this.a * p.mx + this.c * p.my + this.e,
+      my: this.b * p.mx + this.d * p.my + this.f,
     }
   }
 
@@ -62,7 +62,7 @@ export class PanZoom {
     this._m.scale(factor, factor)
     const after = this.inverse(p)
 
-    this._m.translate(after.x - before.x, after.y - before.y)
+    this._m.translate(after.mx - before.mx, after.my - before.my)
   }
 
   public get matrix(): TransformationMatrix {
