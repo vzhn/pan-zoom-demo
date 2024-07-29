@@ -1,5 +1,5 @@
 export class PanZoom1D {
-  constructor(readonly k: number = 1,  readonly b: number = 0) {
+  constructor(readonly k: number = 1, readonly b: number = 0) {
 
   }
 

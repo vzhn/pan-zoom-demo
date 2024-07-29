@@ -2,20 +2,23 @@ import React, {useCallback, useEffect, useRef} from 'react';
 import './App.css';
 import {Point} from "./PanZoom";
 import {StyledCanvas} from "./StyledCanvas";
-import {PanZoom2D} from "./transformation/PanZoom2D";
 import {drawRect} from "./misc/Geometry";
+import {ConstrainedPanZoom} from "./transformation/ConstrainedPanZoom";
+import {PanZoom2D} from "./transformation/PanZoom2D";
 
 const getZoomFactor = (ev: WheelEvent) => Math.pow(10, ev.deltaY / 2000.0);
 
 const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
   const dpr = 1
   const {left, top} = cv.getBoundingClientRect();
-  return {mx: (ev.x - left) * dpr, my: (ev.y - top) * dpr}
+  return { mx: (ev.x - left) * dpr, my: (ev.y - top) * dpr }
 }
 
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const pz = useRef(new PanZoom2D())
+  const pz = useRef(
+    new ConstrainedPanZoom(new PanZoom2D(), { x: 0, y: 0, w: 640, h: 480}, { x: 0, y: 0, w: 1000, h: 1000 })
+  )
 
   const paint = useCallback(() => {
     const canvas = canvasRef.current!;
@@ -37,7 +40,7 @@ const App = () => {
     const mouseDownListener = (): void => {
       const dragListener = (ev: MouseEvent) => {
         ev.preventDefault()
-        pz.current = pz.current.translateScreen(ev.movementX, ev.movementY)
+        pz.current.translateScreen(ev.movementX, ev.movementY)
         // pz.current = fitIntoScreen(pz.current, screenDimensions, canvasDimensions)
         paint()
       };
@@ -55,7 +58,7 @@ const App = () => {
     const wheelListener = (ev: WheelEvent): void => {
       // preventing scrolling
       ev.preventDefault()
-      pz.current = pz.current.zoomAt(canvasCoordinates(canvasRef.current!, ev), getZoomFactor(ev))
+      pz.current.zoomAt(canvasCoordinates(canvasRef.current!, ev), getZoomFactor(ev))
       paint()
     }
 
