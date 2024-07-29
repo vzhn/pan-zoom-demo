@@ -3,8 +3,7 @@ import './App.css';
 import {Point} from "./PanZoom";
 import {StyledCanvas} from "./StyledCanvas";
 import {drawRect} from "./misc/Geometry";
-import {ConstrainedPanZoom} from "./transformation/ConstrainedPanZoom";
-import {PanZoom2D} from "./transformation/PanZoom2D";
+import {ConstrainedPanZoom2D} from "./transformation/constrained/ConstrainedPanZoom2D";
 
 const getZoomFactor = (ev: WheelEvent) => Math.pow(10, ev.deltaY / 2000.0);
 
@@ -17,7 +16,7 @@ const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
 const App = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pz = useRef(
-    new ConstrainedPanZoom(new PanZoom2D(), { x: 0, y: 0, w: 640, h: 480}, { x: 0, y: 0, w: 1000, h: 1000 })
+    new ConstrainedPanZoom2D({ x: 0, y: 0, w: 640, h: 480}, { x: 0, y: 0, w: 1000, h: 1000 })
   )
 
   const paint = useCallback(() => {
