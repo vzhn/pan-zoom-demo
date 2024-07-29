@@ -1,4 +1,3 @@
-import {PanZoom2D} from "../PanZoom2D";
 import {Point, TransformationMatrix} from "../../PanZoom";
 import {ConstrainedPanZoom1D} from "./ConstrainedPanZoom1D";
 import {PanZoom1D} from "../PanZoom1D";
@@ -7,19 +6,23 @@ export interface Rect { x: number, y: number, w: number, h: number }
 
 
 export class ConstrainedPanZoom2D {
-  private tx: ConstrainedPanZoom1D
-  private ty: ConstrainedPanZoom1D
+  readonly tx: ConstrainedPanZoom1D
+  readonly ty: ConstrainedPanZoom1D
 
   constructor(screenLimits: Rect, canvasLimits: Rect) {
-    this.tx = new ConstrainedPanZoom1D(new PanZoom1D(), {
+    this.tx = new ConstrainedPanZoom1D({
       screen: { min: screenLimits.x, max: screenLimits.x + screenLimits.w },
       canvas: { min: canvasLimits.x, max: canvasLimits.x + canvasLimits.w }
     })
 
-    this.ty = new ConstrainedPanZoom1D(new PanZoom1D(), {
+    this.ty = new ConstrainedPanZoom1D({
       screen: { min: screenLimits.y, max: screenLimits.y + screenLimits.h },
       canvas: { min: canvasLimits.y, max: canvasLimits.y + canvasLimits.h }
     })
+
+    const minK = Math.max(this.tx.minScale, this.ty.minScale)
+    this.tx.setK(minK)
+    this.ty.setK(minK)
   }
 
   public zoomAt(p: Point, scale: number): void {
@@ -38,5 +41,9 @@ export class ConstrainedPanZoom2D {
     tm.translate(this.tx.b, this.ty.b)
     tm.scale(this.tx.k, this.ty.k)
     return tm
+  }
+
+  apply(x: number, y: number) {
+    return { x: this.tx.apply(x), y: this.ty.apply(y) }
   }
 }

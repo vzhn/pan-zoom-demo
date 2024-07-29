@@ -6,12 +6,15 @@ export interface Constraint {
 }
 
 export class ConstrainedPanZoom1D {
+  private _pz = new PanZoom1D()
+
   get k() { return this._pz.k }
   get b() { return this._pz.b }
 
-  constructor(
-    private _pz = new PanZoom1D(),
-    private constraint: Constraint) { }
+  constructor(private constraint: Constraint) {
+    this._pz.scale(this.minScale)
+    this.fitOnTheScreen()
+  }
 
   public get minScale(): number {
     const canvasWidth = this.constraint.canvas.max - this.constraint.canvas.min
@@ -40,5 +43,14 @@ export class ConstrainedPanZoom1D {
     if (right < this.constraint.screen.max) {
       this._pz.translateScreen(this.constraint.screen.max - right)
     }
+  }
+
+  apply(p: number): number {
+    return this._pz.apply(p)
+  }
+
+  setK(k: number) {
+    this._pz.setK(k);
+    this.fitOnTheScreen()
   }
 }

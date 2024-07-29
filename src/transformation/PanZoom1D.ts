@@ -37,4 +37,8 @@ export class PanZoom1D {
 
   public get k() { return this._k }
   public get b() { return this._b }
+
+  setK(k: number) {
+    this._k = k
+  }
 }
