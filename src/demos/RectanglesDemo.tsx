@@ -1,8 +1,11 @@
-import React, {useCallback} from "react";
+import React, {useCallback, useState} from "react";
 import {drawRect} from "../misc/Geometry";
 import {Demo, DemoContext, getZoomFactor} from "../Demo";
+import {PanZoom2D} from "../transformation/PanZoom2D";
 
 export const RectanglesDemo = () => {
+  const [panZoom, updatePanZoom] = useState(new PanZoom2D())
+
   const paint = useCallback(({canvas, pz}: DemoContext) => {
     const context = canvas.getContext("2d")!
     drawRect(context, 0, 0, 100, 100)
@@ -13,6 +16,8 @@ export const RectanglesDemo = () => {
   }, [])
 
   return (<Demo
+    panZoom={panZoom}
+    updatePanZoom={updatePanZoom}
     dimensions={{
       canvasWidth: 640,
       canvasHeight: 480,

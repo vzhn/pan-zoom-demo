@@ -3,6 +3,7 @@ import './App.css';
 import {Point} from "./PanZoom";
 import {StyledCanvas} from "./StyledCanvas";
 import {ConstrainedPanZoom2D, Rect} from "./transformation/constrained/ConstrainedPanZoom2D";
+import {PanZoom2D} from "./transformation/PanZoom2D";
 
 export const getZoomFactor = (deltaY: number) => Math.pow(10, deltaY / 2000.0);
 
@@ -23,11 +24,13 @@ export type DemoProps = {
     canvasHeight: number,
     scene: Rect
   },
+  panZoom: PanZoom2D,
+  updatePanZoom: React.Dispatch<React.SetStateAction<PanZoom2D>>,
   paint: (context: DemoContext) => void,
   onWheel: (screenPoint: Point, deltaY: number, context: DemoContext) => void
 };
 
-export const Demo = ({dimensions, paint, onWheel}: DemoProps) => {
+export const Demo = ({dimensions, paint, onWheel, panZoom, updatePanZoom}: DemoProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const pz = useRef(
     new ConstrainedPanZoom2D({ x: 0, y: 0, w: dimensions.canvasWidth, h: dimensions.canvasHeight}, dimensions.scene)

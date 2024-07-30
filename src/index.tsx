@@ -10,6 +10,6 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <ChartDemo/>
-    <RectanglesDemo/>
+    {/*<RectanglesDemo/>*/}
   </React.StrictMode>
 );

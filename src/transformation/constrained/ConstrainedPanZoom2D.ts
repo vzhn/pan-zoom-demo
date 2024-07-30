@@ -1,9 +1,7 @@
 import {Point, TransformationMatrix} from "../../PanZoom";
 import {ConstrainedPanZoom1D} from "./ConstrainedPanZoom1D";
-import {PanZoom1D} from "../PanZoom1D";
 
 export interface Rect { x: number, y: number, w: number, h: number }
-
 
 export class ConstrainedPanZoom2D {
   readonly tx: ConstrainedPanZoom1D
