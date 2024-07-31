@@ -29,7 +29,7 @@ export type DemoProps<Data> = {
   onWheel: (screenPoint: Point, deltaY: number, context: DemoContext) => void,
 
   onStartDrag?: (screenPoint: Point, context: DemoContext) => boolean
-  onDrag?: (move: { dx: number, dy: number}) => void
+  onDrag?: (move: { dx: number, dy: number}, context: DemoContext) => void
   onStopDrag?: () => void
 };
 
@@ -60,7 +60,7 @@ export const  Demo = <Data,>({
           const dragListener = (ev: MouseEvent) => {
             ev.preventDefault()
             if (onDrag) {
-              onDrag({dx: ev.movementX, dy: ev.movementY})
+              onDrag({dx: ev.movementX, dy: ev.movementY}, getDemoContext())
             }
           };
 
@@ -74,10 +74,6 @@ export const  Demo = <Data,>({
         }
       }
     }
-    const mouseListener = (ev: MouseEvent): void => {
-      // preventing text selection
-      ev.preventDefault()
-    }
     const wheelListener = (ev: WheelEvent): void => {
       // preventing scrolling
       ev.preventDefault()
@@ -86,12 +82,10 @@ export const  Demo = <Data,>({
 
     canvas.addEventListener('mousedown', mouseDownListener)
     canvas.addEventListener('wheel', wheelListener, { passive: false, capture: true })
-    canvas.addEventListener('mousemove', mouseListener)
 
     repaint()
     return () => {
       canvas.removeEventListener('mousedown', mouseDownListener)
-      canvas.removeEventListener('mousemove', mouseListener)
       canvas.removeEventListener('wheel', wheelListener)
     }
   })

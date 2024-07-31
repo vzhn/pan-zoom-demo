@@ -2,8 +2,6 @@ import {Point, TransformationMatrix} from "../../PanZoom";
 import {ConstrainedPanZoom1D, Constraint, minScale} from "./ConstrainedPanZoom1D";
 import {PanZoom1D} from "../PanZoom1D";
 
-export interface Rect { x: number, y: number, w: number, h: number }
-
 export class ConstrainedPanZoom2D {
   constructor(readonly tx: ConstrainedPanZoom1D, readonly ty: ConstrainedPanZoom1D) {
 
@@ -11,6 +9,11 @@ export class ConstrainedPanZoom2D {
 
   public zoomXAt(x: number, scale: number) {
     return new ConstrainedPanZoom2D(this.tx.zoomAt(x, scale), this.ty)
+  }
+
+  public zoomAt({mx, my}: Point, scale: number) {
+    const scaleLimit = Math.max(minScale(this.tx.constraint), minScale(this.ty.constraint))
+    return new ConstrainedPanZoom2D(this.tx.zoomAt(mx, scale, scaleLimit), this.ty.zoomAt(my, scale, scaleLimit))
   }
 
   apply(x: number, y: number) {
