@@ -11,28 +11,24 @@ export class PanZoom2D {
     return {mx: this.tx.apply(mx), my: this.ty.apply(my)}
   }
 
-  public scale(sx: number, sy: number): void {
-    this.tx.scale(sx);
-    this.ty.scale(sy);
+  public scale(sx: number, sy: number): PanZoom2D {
+    return new PanZoom2D(this.tx.scale(sx), this.ty.scale(sy));
   }
 
-  public translate(tx: number, ty: number): void {
-    this.tx.translate(tx);
-    this.ty.translate(ty);
+  public translate(tx: number, ty: number): PanZoom2D {
+    return new PanZoom2D(this.tx.translate(tx), this.ty.translate(ty));
   }
 
-  public translateScreen(tx: number, ty: number): void {
-    this.tx.translateScreen(tx);
-    this.ty.translateScreen(ty);
+  public translateScreen(tx: number, ty: number): PanZoom2D {
+    return new PanZoom2D(this.tx.translateScreen(tx), this.ty.translateScreen(ty));
   }
 
   public inv(): PanZoom2D {
     return new PanZoom2D(this.tx.inv(), this.ty.inv())
   }
 
-  public zoomAt({mx, my}: Point, scale: number): void {
-    this.tx.zoomAt(mx, scale)
-    this.ty.zoomAt(my, scale)
+  public zoomAt({mx, my}: Point, scale: number): PanZoom2D {
+    return new PanZoom2D(this.tx.zoomAt(mx, scale), this.ty.zoomAt(my, scale))
   }
 
   public get matrix(): TransformationMatrix {

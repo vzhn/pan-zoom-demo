@@ -1,37 +1,24 @@
 import {Point, TransformationMatrix} from "../../PanZoom";
-import {ConstrainedPanZoom1D} from "./ConstrainedPanZoom1D";
+import {ConstrainedPanZoom1D, Constraint, minScale} from "./ConstrainedPanZoom1D";
+import {PanZoom1D} from "../PanZoom1D";
 
 export interface Rect { x: number, y: number, w: number, h: number }
 
 export class ConstrainedPanZoom2D {
-  readonly tx: ConstrainedPanZoom1D
-  readonly ty: ConstrainedPanZoom1D
+  constructor(readonly tx: ConstrainedPanZoom1D, readonly ty: ConstrainedPanZoom1D) {
 
-  constructor(screenLimits: Rect, canvasLimits: Rect) {
-    this.tx = new ConstrainedPanZoom1D({
-      screen: { min: screenLimits.x, max: screenLimits.x + screenLimits.w },
-      canvas: { min: canvasLimits.x, max: canvasLimits.x + canvasLimits.w }
-    })
-
-    this.ty = new ConstrainedPanZoom1D({
-      screen: { min: screenLimits.y, max: screenLimits.y + screenLimits.h },
-      canvas: { min: canvasLimits.y, max: canvasLimits.y + canvasLimits.h }
-    })
-
-    const minK = Math.max(this.tx.minScale, this.ty.minScale)
-    this.tx.setK(minK)
-    this.ty.setK(minK)
   }
 
-  public zoomAt(p: Point, scale: number): void {
-    const scaleLimit = Math.max(this.tx.minScale, this.ty.minScale)
-    this.tx.zoomAt(p.mx, scale, scaleLimit)
-    this.ty.zoomAt(p.my, scale, scaleLimit)
+  public zoomXAt(x: number, scale: number) {
+    return new ConstrainedPanZoom2D(this.tx.zoomAt(x, scale), this.ty)
   }
 
-  public translateScreen(tx: number, ty: number): void {
-    this.tx.translateScreen(tx)
-    this.ty.translateScreen(ty)
+  apply(x: number, y: number) {
+    return { x: this.tx.apply(x), y: this.ty.apply(y) }
+  }
+
+  public translateScreen(tx: number, ty: number): ConstrainedPanZoom2D {
+    return new ConstrainedPanZoom2D(this.tx.translateScreen(tx), this.ty.translateScreen(ty))
   }
 
   public get matrix(): TransformationMatrix {
@@ -41,7 +28,46 @@ export class ConstrainedPanZoom2D {
     return tm
   }
 
-  apply(x: number, y: number) {
-    return { x: this.tx.apply(x), y: this.ty.apply(y) }
+  public updateConstraints(cx: Constraint, cy: Constraint) {
+    return new ConstrainedPanZoom2D(
+      new ConstrainedPanZoom1D(this.tx.pz, cx),
+      new ConstrainedPanZoom1D(this.ty.pz, cy)
+    )
+  }
+
+  public setMinScale(separate = false): ConstrainedPanZoom2D {
+    if (separate) {
+      const minKx = minScale(this.tx.constraint);
+      const minKy = minScale(this.ty.constraint);
+      return new ConstrainedPanZoom2D(this.tx.setK(minKx), this.ty.setK(minKy))
+    } else {
+      const scale = Math.min(minScale(this.tx.constraint), minScale(this.ty.constraint))
+      return new ConstrainedPanZoom2D(this.tx.setK(scale), this.ty.setK(scale))
+    }
+  }
+
+  public adjustScale(separate = false): ConstrainedPanZoom2D {
+    if (separate) {
+      const minKx = minScale(this.tx.constraint);
+      const minKy = minScale(this.ty.constraint);
+
+      const kx = Math.max(this.tx.k, minKx)
+      const ky = Math.max(this.ty.k, minKy)
+      return new ConstrainedPanZoom2D(this.tx.setK(kx), this.ty.setK(ky))
+    } else {
+      if (!this.tx.constraint || !this.ty.constraint) return this;
+
+      const maxScale = Math.max(minScale(this.tx.constraint), minScale(this.ty.constraint))
+      const kx = Math.max(this.tx.k, maxScale)
+      const ky = Math.max(this.ty.k, maxScale)
+      return new ConstrainedPanZoom2D(this.tx.setK(kx), this.ty.setK(ky))
+    }
+  }
+
+  public adjustPosition(): ConstrainedPanZoom2D {
+    return new ConstrainedPanZoom2D(
+      this.tx.adjustPosition(),
+      this.ty.adjustPosition()
+    )
   }
 }

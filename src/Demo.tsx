@@ -1,9 +1,8 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useCallback, useEffect, useRef} from 'react';
 import './App.css';
 import {Point} from "./PanZoom";
 import {StyledCanvas} from "./StyledCanvas";
-import {ConstrainedPanZoom2D, Rect} from "./transformation/constrained/ConstrainedPanZoom2D";
-import {PanZoom2D} from "./transformation/PanZoom2D";
+import {ConstrainedPanZoom2D} from "./transformation/constrained/ConstrainedPanZoom2D";
 
 export const getZoomFactor = (deltaY: number) => Math.pow(10, deltaY / 2000.0);
 
@@ -18,49 +17,62 @@ export type DemoContext = {
   pz: ConstrainedPanZoom2D
 }
 
-export type DemoProps = {
+export type DemoProps<Data> = {
   dimensions: {
     canvasWidth: number,
     canvasHeight: number,
-    scene: Rect
   },
-  panZoom: PanZoom2D,
-  updatePanZoom: React.Dispatch<React.SetStateAction<PanZoom2D>>,
-  paint: (context: DemoContext) => void,
-  onWheel: (screenPoint: Point, deltaY: number, context: DemoContext) => void
+  data: Data,
+  paint: (context: DemoContext, data: Data) => void,
+  panZoom: ConstrainedPanZoom2D,
+  updatePanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
+  onWheel: (screenPoint: Point, deltaY: number, context: DemoContext) => void,
+
+  onStartDrag?: (screenPoint: Point, context: DemoContext) => boolean
+  onDrag?: (move: { dx: number, dy: number}) => void
+  onStopDrag?: () => void
 };
 
-export const Demo = ({dimensions, paint, onWheel, panZoom, updatePanZoom}: DemoProps) => {
+export const  Demo = <Data,>({
+  data, dimensions, paint, onWheel, panZoom, updatePanZoom, onStartDrag, onDrag, onStopDrag
+}: DemoProps<Data>) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const pz = useRef(
-    new ConstrainedPanZoom2D({ x: 0, y: 0, w: dimensions.canvasWidth, h: dimensions.canvasHeight}, dimensions.scene)
-  )
-
-  const getDemoContext = () => ({canvas: canvasRef.current!, pz: pz.current});
+  const getDemoContext = useCallback(
+    () => ({canvas: canvasRef.current!, pz: panZoom}), [panZoom])
 
   const repaint = useCallback(() => {
     const canvas = canvasRef.current!
     const context = canvas.getContext("2d")!
     context.resetTransform()
     context.clearRect(0, 0, canvas.width, canvas.height)
-    context.setTransform(pz.current.matrix)
+    context.setTransform(panZoom.matrix)
 
-    paint(getDemoContext())
-  }, [])
+    paint(getDemoContext(), data)
+  }, [data, panZoom])
+
+  useEffect(() => repaint(), [data, panZoom]);
 
   useEffect(() => {
     const canvas = canvasRef.current!;
-    const mouseDownListener = (): void => {
-      const dragListener = (ev: MouseEvent) => {
-        ev.preventDefault()
-        pz.current.translateScreen(ev.movementX, ev.movementY)
-        repaint()
-      };
-      window.addEventListener('mousemove', dragListener)
-      window.addEventListener('mouseup', () => {
-        window.removeEventListener('mousedown', mouseDownListener);
-        window.removeEventListener('mousemove', dragListener);
-      }, { once: true })
+    const mouseDownListener = (ev: MouseEvent): void => {
+      if (onStartDrag) {
+        if (onStartDrag(canvasCoordinates(canvasRef.current!, ev), getDemoContext())) {
+          const dragListener = (ev: MouseEvent) => {
+            ev.preventDefault()
+            if (onDrag) {
+              onDrag({dx: ev.movementX, dy: ev.movementY})
+            }
+          };
+
+          window.addEventListener('mousemove', dragListener)
+          window.addEventListener('mouseup', () => {
+            if (onStopDrag) {
+              onStopDrag()
+            }
+            window.removeEventListener('mousemove', dragListener);
+          }, { once: true })
+        }
+      }
     }
     const mouseListener = (ev: MouseEvent): void => {
       // preventing text selection
@@ -70,11 +82,10 @@ export const Demo = ({dimensions, paint, onWheel, panZoom, updatePanZoom}: DemoP
       // preventing scrolling
       ev.preventDefault()
       onWheel(canvasCoordinates(canvasRef.current!, ev), ev.deltaY, getDemoContext())
-      repaint()
     }
 
     canvas.addEventListener('mousedown', mouseDownListener)
-    canvas.addEventListener('wheel', wheelListener)
+    canvas.addEventListener('wheel', wheelListener, { passive: false, capture: true })
     canvas.addEventListener('mousemove', mouseListener)
 
     repaint()
