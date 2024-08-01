@@ -3,4 +3,4 @@ export type ChartData = {
   dataMin: number,
   dataMax: number
 }
-export type MinimapData = ChartData & { leftX: number, rightX: number }
+export type MiniChartData = ChartData & { leftX: number, rightX: number }

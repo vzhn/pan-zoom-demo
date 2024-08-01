@@ -2,7 +2,7 @@ import {ConstrainedPanZoom2D} from "../../transformation/constrained/Constrained
 import React, {useCallback, useEffect, useState} from "react";
 import {Demo, getZoomFactor} from "../../Demo";
 import {updateChartConstraints} from "./updateChartConstraints";
-import {ChartData, MinimapData} from "./ChartData";
+import {ChartData, MiniChartData} from "./ChartData";
 import {drawLines} from "../../misc/Geometry";
 
 export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPanZoom}: {
@@ -34,7 +34,7 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
     updateRightX(rightX)
   }, [chartPanZoom]);
 
-  const paint = useCallback((ctx: CanvasRenderingContext2D, { leftX, rightX}: MinimapData) => {
+  const paint = useCallback((ctx: CanvasRenderingContext2D, { leftX, rightX}: MiniChartData) => {
     ctx.resetTransform()
 
     ctx.fillStyle = '#d3d3d3'
@@ -54,7 +54,7 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
   const dragConstraint = useCallback((x: number) => x >= leftX && x <= rightX, [leftX, rightX])
 
   return (<>
-    <Demo<MinimapData>
+    <Demo<MiniChartData>
       dimensions={{ canvasWidth: width, canvasHeight: height }}
       data={{ ...chartData, leftX, rightX }}
       panZoom={minichartPanZoom}
