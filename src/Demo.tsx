@@ -28,19 +28,26 @@ export type DemoProps<Data> = {
   onStopDrag?: () => void
 };
 
-export const  Demo = <Data,>({
-  data, dimensions, paint, onWheel, panZoom, updatePanZoom, onStartDrag, onDrag, onStopDrag
+const applyTransform = (canvas: HTMLCanvasElement, pz: ConstrainedPanZoom2D) => {
+  const context = canvas.getContext("2d")!
+  context.resetTransform()
+  context.translate(pz.tx.b, pz.ty.b)
+  context.scale(pz.tx.k, pz.tx.k)
+}
+
+export const Demo = <Data,>({
+  data, dimensions, paint, onWheel, panZoom, onStartDrag, onDrag, onStopDrag
 }: DemoProps<Data>) => {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const getDemoContext = useCallback(
-    () => ({canvas: canvasRef.current!, pz: panZoom}), [panZoom])
 
   const repaint = useCallback(() => {
     const canvas = canvasRef.current!
     const context = canvas.getContext("2d")!
     context.resetTransform()
     context.clearRect(0, 0, canvas.width, canvas.height)
-    context.setTransform(panZoom.matrix)
+
+    applyTransform(canvas, panZoom)
+    // context.setTransform(panZoom.matrix)
 
     paint(context, data)
   }, [data, panZoom])

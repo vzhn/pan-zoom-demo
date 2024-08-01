@@ -1,7 +1,3 @@
-interface Transformation1D {
-
-}
-
 export class PanZoom1D {
   constructor(
     private readonly _k: number = 1,

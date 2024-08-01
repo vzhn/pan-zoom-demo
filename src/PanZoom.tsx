@@ -40,32 +40,3 @@ export class TransformationMatrix implements DOMMatrix2DInit {
     return m
   }
 }
-
-export class PanZoom {
-  private _m = new TransformationMatrix()
-
-  transform = (p: Point) => {
-    return this.matrix.apply(p)
-  }
-
-  inverse = (p: Point) => {
-    return this.matrix.inv().apply(p)
-  }
-
-  translate = (dx: number, dy: number) => {
-    this._m.translate(dx / this._m.a, dy / this._m.d)
-  }
-
-  zoomAt = (p: Point, degree: number) => {
-    const before = this.inverse(p)
-    let factor = Math.exp(0.10 * degree);
-    this._m.scale(factor, factor)
-    const after = this.inverse(p)
-
-    this._m.translate(after.mx - before.mx, after.my - before.my)
-  }
-
-  public get matrix(): TransformationMatrix {
-    return this._m
-  }
-}
