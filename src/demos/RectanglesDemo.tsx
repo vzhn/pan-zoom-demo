@@ -54,7 +54,7 @@ export const RectanglesDemo = () => {
           canvasHeight: 480
         }}
         paint={paint}
-        onWheel={(p, deltaY) => updatePanZoom(panZoom.zoomAt(p, getZoomFactor(deltaY)))}
+        onWheel={(p, deltaY) => updatePanZoom(pz => pz.zoomAt(p, getZoomFactor(deltaY)))}
         onStartDrag={() => true}
         onDrag={onDrag}
         data={data}

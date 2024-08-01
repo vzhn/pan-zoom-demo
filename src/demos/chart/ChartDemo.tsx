@@ -7,11 +7,11 @@ import {MainChart} from "./MainChart";
 import {MiniChart} from "./MiniChart";
 import {StyledColumn} from "../../styled/StyledColumn";
 
-export const ChartDemo = () => {
-  const chartWidth = 640;
-  const chartHeight = 480;
-  const minimapHeight = 50
+const chartWidth = 640;
+const chartHeight = 480;
+const minimapHeight = 50
 
+export const ChartDemo = () => {
   const chartData = useMemo(() => createRandomData(200), [])
 
   const [panZoom, updatePanZoom] =
