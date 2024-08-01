@@ -8,8 +8,9 @@ import {MiniChart} from "./MiniChart";
 import {StyledColumn} from "../../styled/StyledColumn";
 
 export const ChartDemo = () => {
-  const canvasWidth = 640;
-  const canvasHeight = 480;
+  const chartWidth = 640;
+  const chartHeight = 480;
+  const minimapHeight = 50
 
   const chartData = useMemo(() => createRandomData(200), [])
 
@@ -25,14 +26,14 @@ export const ChartDemo = () => {
     <StyledColumn>
       <h2>Chart</h2>
       <MainChart
-        width={canvasWidth} height={canvasHeight}
+        width={chartWidth} height={chartHeight}
         chartData={chartData}
         panZoom={panZoom}
         updatePanZoom={updatePanZoom}
         paint={paint}
       />
       <MiniChart
-        width={canvasWidth} height={50}
+        width={chartWidth} height={minimapHeight}
         chartData={chartData}
         chartPanZoom={panZoom}
         updateChartPanZoom={updatePanZoom}
