@@ -50,8 +50,8 @@ export const RectanglesDemo = () => {
         panZoom={panZoom}
         updatePanZoom={updatePanZoom}
         dimensions={{
-          canvasWidth: 640,
-          canvasHeight: 480
+          canvasWidth: width,
+          canvasHeight: height
         }}
         paint={paint}
         onWheel={(p, deltaY) => updatePanZoom(pz => pz.zoomAt(p, getZoomFactor(deltaY)))}
