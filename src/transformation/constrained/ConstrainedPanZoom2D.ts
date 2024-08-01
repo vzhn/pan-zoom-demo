@@ -3,9 +3,10 @@ import {ConstrainedPanZoom1D, Constraint, minScale} from "./ConstrainedPanZoom1D
 import {PanZoom1D} from "../PanZoom1D";
 
 export class ConstrainedPanZoom2D {
-  constructor(readonly tx: ConstrainedPanZoom1D, readonly ty: ConstrainedPanZoom1D) {
-
-  }
+  constructor(
+    readonly tx: ConstrainedPanZoom1D = new ConstrainedPanZoom1D(),
+    readonly ty: ConstrainedPanZoom1D = new ConstrainedPanZoom1D()
+  ) { }
 
   public zoomXAt(x: number, scale: number) {
     return new ConstrainedPanZoom2D(this.tx.zoomAt(x, scale), this.ty)

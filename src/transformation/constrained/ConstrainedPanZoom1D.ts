@@ -65,7 +65,9 @@ export class ConstrainedPanZoom1D {
   }
 
   public updateConstraint(c: Constraint): ConstrainedPanZoom1D {
-    return new ConstrainedPanZoom1D(this._pz, c).adjustScale().adjustPosition()
+    return new ConstrainedPanZoom1D(this._pz, c)
+      .adjustScale()
+      .adjustPosition()
   }
 
   public static forConstraint(c: Constraint) {

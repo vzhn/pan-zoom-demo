@@ -12,24 +12,19 @@ const canvasCoordinates = (cv: HTMLCanvasElement, ev: MouseEvent): Point => {
   return { mx: (ev.x - left) * dpr, my: (ev.y - top) * dpr }
 }
 
-export type DemoContext = {
-  canvas: HTMLCanvasElement;
-  pz: ConstrainedPanZoom2D
-}
-
 export type DemoProps<Data> = {
   dimensions: {
     canvasWidth: number,
     canvasHeight: number,
   },
   data: Data,
-  paint: (context: DemoContext, data: Data) => void,
+  paint: (canvas: HTMLCanvasElement, data: Data) => void,
   panZoom: ConstrainedPanZoom2D,
   updatePanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
-  onWheel: (screenPoint: Point, deltaY: number, context: DemoContext) => void,
+  onWheel: (screenPoint: Point, deltaY: number) => void,
 
-  onStartDrag?: (screenPoint: Point, context: DemoContext) => boolean
-  onDrag?: (move: { dx: number, dy: number}, context: DemoContext) => void
+  onStartDrag?: (screenPoint: Point, canvas: HTMLCanvasElement) => boolean
+  onDrag?: (move: { dx: number, dy: number}, canvas: HTMLCanvasElement) => void
   onStopDrag?: () => void
 };
 
@@ -47,7 +42,7 @@ export const  Demo = <Data,>({
     context.clearRect(0, 0, canvas.width, canvas.height)
     context.setTransform(panZoom.matrix)
 
-    paint(getDemoContext(), data)
+    paint(canvas, data)
   }, [data, panZoom])
 
   useEffect(() => repaint(), [data, panZoom]);
@@ -56,11 +51,11 @@ export const  Demo = <Data,>({
     const canvas = canvasRef.current!;
     const mouseDownListener = (ev: MouseEvent): void => {
       if (onStartDrag) {
-        if (onStartDrag(canvasCoordinates(canvasRef.current!, ev), getDemoContext())) {
+        if (onStartDrag(canvasCoordinates(canvasRef.current!, ev), canvas)) {
           const dragListener = (ev: MouseEvent) => {
             ev.preventDefault()
             if (onDrag) {
-              onDrag({dx: ev.movementX, dy: ev.movementY}, getDemoContext())
+              onDrag({dx: ev.movementX, dy: ev.movementY}, canvas)
             }
           };
 
@@ -77,7 +72,7 @@ export const  Demo = <Data,>({
     const wheelListener = (ev: WheelEvent): void => {
       // preventing scrolling
       ev.preventDefault()
-      onWheel(canvasCoordinates(canvasRef.current!, ev), ev.deltaY, getDemoContext())
+      onWheel(canvasCoordinates(canvasRef.current!, ev), ev.deltaY)
     }
 
     canvas.addEventListener('mousedown', mouseDownListener)
@@ -88,7 +83,7 @@ export const  Demo = <Data,>({
       canvas.removeEventListener('mousedown', mouseDownListener)
       canvas.removeEventListener('wheel', wheelListener)
     }
-  })
+  }, [panZoom])
 
   return (
     <div className="App">

@@ -1,5 +1,6 @@
 import {ConstrainedPanZoom2D} from "../../transformation/constrained/ConstrainedPanZoom2D";
-import {ChartData} from "./ChartDemo";
+
+import {ChartData} from "./ChartData";
 
 export const updateChartConstraints = (
   prevPanZoom: ConstrainedPanZoom2D,

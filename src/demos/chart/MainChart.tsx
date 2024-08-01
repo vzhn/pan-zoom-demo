@@ -1,8 +1,8 @@
 import {ConstrainedPanZoom2D} from "../../transformation/constrained/ConstrainedPanZoom2D";
 import React, {useCallback, useEffect} from "react";
-import {Demo, DemoContext, getZoomFactor} from "../../Demo";
-import {ChartData} from "./ChartDemo";
+import {Demo,  getZoomFactor} from "../../Demo";
 import {updateChartConstraints} from "./updateChartConstraints";
+import {ChartData} from "./ChartData";
 
 export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZoom}: {
   chartData: ChartData,
@@ -10,12 +10,12 @@ export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZo
   height: number,
   panZoom: ConstrainedPanZoom2D,
   updatePanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
-  paint: (context: DemoContext, data: ChartData) => void
+  paint: (canvas: HTMLCanvasElement, data: ChartData) => void
 }) => {
   useEffect(() => {
     updatePanZoom((prevPanZoom) =>
       updateChartConstraints(prevPanZoom, width, height, chartData, 10, 10))
-  }, [chartData]);
+  }, [width, height, chartData]);
 
   const onDrag = useCallback(({dx, dy}: { dx: number, dy: number }) => {
     updatePanZoom(pz => pz.translateScreen(dx, dy))
@@ -29,9 +29,7 @@ export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZo
       paint={paint}
       onStartDrag={() => true}
       onDrag={onDrag}
-      onWheel={(p, deltaY, {pz}) => {
-        updatePanZoom(pz.zoomXAt(p.mx, getZoomFactor(deltaY)))
-      }}
+      onWheel={(p, deltaY) => updatePanZoom(panZoom.zoomXAt(p.mx, getZoomFactor(deltaY)))}
     />
   </>)
 }

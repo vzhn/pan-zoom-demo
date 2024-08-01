@@ -1,6 +1,6 @@
 import React, {useCallback, useMemo, useState} from "react";
 import {drawRect} from "../misc/Geometry";
-import {Demo, DemoContext, getZoomFactor} from "../Demo";
+import {Demo,  getZoomFactor} from "../Demo";
 import {ConstrainedPanZoom2D} from "../transformation/constrained/ConstrainedPanZoom2D";
 import {ConstrainedPanZoom1D} from "../transformation/constrained/ConstrainedPanZoom1D";
 
@@ -33,13 +33,13 @@ export const RectanglesDemo = () => {
         .adjustPosition()
     )
 
-  const paint = useCallback(({canvas, pz}: DemoContext, data: Rect[]) => {
+  const paint = useCallback((canvas: HTMLCanvasElement, data: Rect[]) => {
     const context = canvas.getContext("2d")!
-    context.setTransform(pz.matrix)
+    context.setTransform(panZoom.matrix)
 
     data.forEach(({x, y, w, h}) =>
       drawRect(context, x, y, w, h))
-  }, [])
+  }, [panZoom])
 
   const onDrag = useCallback(({dx, dy}: { dx: number, dy: number }) => {
     updatePanZoom(pz => pz.translateScreen(dx, dy))

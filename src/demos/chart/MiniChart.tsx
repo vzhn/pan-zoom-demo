@@ -1,23 +1,22 @@
 import {ConstrainedPanZoom2D} from "../../transformation/constrained/ConstrainedPanZoom2D";
 import React, {useCallback, useEffect, useState} from "react";
-import {Demo, DemoContext, getZoomFactor} from "../../Demo";
-import {ConstrainedPanZoom1D} from "../../transformation/constrained/ConstrainedPanZoom1D";
-import {ChartData, MinimapData} from "./ChartDemo";
+import {Demo, getZoomFactor} from "../../Demo";
 import {updateChartConstraints} from "./updateChartConstraints";
+import {ChartData, MinimapData} from "./ChartData";
+import {drawLines} from "../../misc/Geometry";
 
-export const MiniChart = ({chartData, width, height, chartPanZoom, paintChart, updateChartPanZoom}: {
+export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPanZoom}: {
   chartData: ChartData,
   width: number,
   height: number,
   chartPanZoom: ConstrainedPanZoom2D,
   updateChartPanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
-  paintChart: (context: DemoContext, data: ChartData) => void
 }) => {
   const [leftX, updateLeftX] = useState(0)
   const [rightX, updateRightX] = useState(width)
 
   const [minichartPanZoom, updateMinichartPanZoom] =
-    useState(new ConstrainedPanZoom2D(new ConstrainedPanZoom1D(), new ConstrainedPanZoom1D()))
+    useState(new ConstrainedPanZoom2D())
 
   useEffect(() => {
     updateMinichartPanZoom((prevPanZoom) =>
@@ -35,16 +34,19 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, paintChart, u
     updateRightX(rightX)
   }, [chartPanZoom]);
 
-  const paint = useCallback((context: DemoContext, data: MinimapData) => {
-    const ctx = context.canvas.getContext("2d")!
+  const paint = useCallback((canvas: HTMLCanvasElement, data: MinimapData) => {
+    const ctx = canvas.getContext("2d")!
     const { leftX, rightX} = data
 
     ctx.resetTransform()
     ctx.fillStyle = '#d3d3d3'
     ctx.fillRect(0, 0, leftX, height)
     ctx.fillRect(rightX, 0, width, height)
-    paintChart(context, data)
-  }, [paintChart])
+
+    ctx.resetTransform()
+
+    drawLines(ctx, minichartPanZoom, chartData.data);
+  }, [minichartPanZoom])
 
 
   const onDrag = useCallback(({dx}: { dx: number }) => {
