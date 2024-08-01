@@ -51,6 +51,8 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
     })
   }, [minichartPanZoom]);
 
+  const dragConstraint = useCallback((x: number) => x >= leftX && x <= rightX, [leftX, rightX])
+
   return (<>
     <Demo<MinimapData>
       dimensions={{ canvasWidth: width, canvasHeight: height }}
@@ -60,11 +62,11 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
       paint={paint}
       onDrag={onDrag}
       onWheel={({mx}, deltaY) => {
-        if (mx >= leftX && mx <= rightX) {
+        if (dragConstraint(mx)) {
           updateChartPanZoom(cpz => cpz.zoomXAt(mx, getZoomFactor(deltaY)))
         }
       }}
-      onStartDrag={({mx}) => mx >= leftX && mx <= rightX}
+      onStartDrag={({mx}) => dragConstraint(mx)}
     />
   </>)
 }
