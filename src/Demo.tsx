@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef} from 'react';
 import './App.css';
 import {Point} from "./PanZoom";
-import {StyledCanvas} from "./StyledCanvas";
+import {StyledCanvas} from "./styled/StyledCanvas";
 import {ConstrainedPanZoom2D} from "./transformation/constrained/ConstrainedPanZoom2D";
 
 export const getZoomFactor = (deltaY: number) => Math.pow(10, deltaY / 2000.0);
@@ -18,7 +18,7 @@ export type DemoProps<Data> = {
     canvasHeight: number,
   },
   data: Data,
-  paint: (canvas: HTMLCanvasElement, data: Data) => void,
+  paint: (ctx: CanvasRenderingContext2D, data: Data) => void,
   panZoom: ConstrainedPanZoom2D,
   updatePanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
   onWheel: (screenPoint: Point, deltaY: number) => void,
@@ -42,7 +42,7 @@ export const  Demo = <Data,>({
     context.clearRect(0, 0, canvas.width, canvas.height)
     context.setTransform(panZoom.matrix)
 
-    paint(canvas, data)
+    paint(context, data)
   }, [data, panZoom])
 
   useEffect(() => repaint(), [data, panZoom]);
@@ -50,25 +50,26 @@ export const  Demo = <Data,>({
   useEffect(() => {
     const canvas = canvasRef.current!;
     const mouseDownListener = (ev: MouseEvent): void => {
-      if (onStartDrag) {
-        if (onStartDrag(canvasCoordinates(canvasRef.current!, ev), canvas)) {
-          const dragListener = (ev: MouseEvent) => {
-            ev.preventDefault()
-            if (onDrag) {
-              onDrag({dx: ev.movementX, dy: ev.movementY}, canvas)
-            }
-          };
+      if (!onStartDrag) return;
 
-          window.addEventListener('mousemove', dragListener)
-          window.addEventListener('mouseup', () => {
-            if (onStopDrag) {
-              onStopDrag()
-            }
-            window.removeEventListener('mousemove', dragListener);
-          }, { once: true })
-        }
+      if (onStartDrag(canvasCoordinates(canvasRef.current!, ev), canvas)) {
+        const dragListener = (ev: MouseEvent) => {
+          ev.preventDefault()
+          if (onDrag) {
+            onDrag({dx: ev.movementX, dy: ev.movementY}, canvas)
+          }
+        };
+
+        window.addEventListener('mousemove', dragListener)
+        window.addEventListener('mouseup', () => {
+          if (onStopDrag) {
+            onStopDrag()
+          }
+          window.removeEventListener('mousemove', dragListener);
+        }, {once: true})
       }
     }
+
     const wheelListener = (ev: WheelEvent): void => {
       // preventing scrolling
       ev.preventDefault()
@@ -81,9 +82,9 @@ export const  Demo = <Data,>({
     repaint()
     return () => {
       canvas.removeEventListener('mousedown', mouseDownListener)
-      canvas.removeEventListener('wheel', wheelListener)
+      canvas.removeEventListener('wheel', wheelListener, { capture: true })
     }
-  }, [panZoom])
+  }, [data])
 
   return (
     <div className="App">

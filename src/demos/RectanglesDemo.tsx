@@ -33,12 +33,10 @@ export const RectanglesDemo = () => {
         .adjustPosition()
     )
 
-  const paint = useCallback((canvas: HTMLCanvasElement, data: Rect[]) => {
-    const context = canvas.getContext("2d")!
-    context.setTransform(panZoom.matrix)
+  const paint = useCallback((ctx: CanvasRenderingContext2D, data: Rect[]) => {
+    ctx.setTransform(panZoom.matrix)
 
-    data.forEach(({x, y, w, h}) =>
-      drawRect(context, x, y, w, h))
+    data.forEach(({x, y, w, h}) => drawRect(ctx, x, y, w, h))
   }, [panZoom])
 
   const onDrag = useCallback(({dx, dy}: { dx: number, dy: number }) => {

@@ -16,6 +16,7 @@ export const drawRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w:
   drawDot(ctx, x + w, y + h)
 }
 
+/** draw with transformation applied to dots */
 export const drawLines = (context: CanvasRenderingContext2D, pz: ConstrainedPanZoom2D, data: number[]) => {
   context.beginPath()
   let p = pz.apply(0, data[0])

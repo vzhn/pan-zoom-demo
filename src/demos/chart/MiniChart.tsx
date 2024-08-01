@@ -34,20 +34,15 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
     updateRightX(rightX)
   }, [chartPanZoom]);
 
-  const paint = useCallback((canvas: HTMLCanvasElement, data: MinimapData) => {
-    const ctx = canvas.getContext("2d")!
-    const { leftX, rightX} = data
-
+  const paint = useCallback((ctx: CanvasRenderingContext2D, { leftX, rightX}: MinimapData) => {
     ctx.resetTransform()
+
     ctx.fillStyle = '#d3d3d3'
     ctx.fillRect(0, 0, leftX, height)
     ctx.fillRect(rightX, 0, width, height)
 
-    ctx.resetTransform()
-
     drawLines(ctx, minichartPanZoom, chartData.data);
   }, [minichartPanZoom])
-
 
   const onDrag = useCallback(({dx}: { dx: number }) => {
     updateChartPanZoom((pz: ConstrainedPanZoom2D) => {
@@ -58,16 +53,18 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
 
   return (<>
     <Demo<MinimapData>
-      dimensions={{canvasWidth: width, canvasHeight: height}}
-      data={{...chartData, leftX, rightX}}
+      dimensions={{ canvasWidth: width, canvasHeight: height }}
+      data={{ ...chartData, leftX, rightX }}
       panZoom={minichartPanZoom}
       updatePanZoom={updateMinichartPanZoom}
       paint={paint}
-      onWheel={(p, deltaY) => {
-        updateChartPanZoom(chartPanZoom.zoomXAt(p.mx, getZoomFactor(deltaY)))
-      }}
       onDrag={onDrag}
-      onStartDrag={({mx, my}) => mx >= leftX && mx <= rightX}
+      onWheel={({mx}, deltaY) => {
+        if (mx >= leftX && mx <= rightX) {
+          updateChartPanZoom(cpz => cpz.zoomXAt(mx, getZoomFactor(deltaY)))
+        }
+      }}
+      onStartDrag={({mx}) => mx >= leftX && mx <= rightX}
     />
   </>)
 }

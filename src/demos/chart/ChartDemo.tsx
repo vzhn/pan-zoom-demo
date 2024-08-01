@@ -5,7 +5,7 @@ import {ConstrainedPanZoom2D} from "../../transformation/constrained/Constrained
 import {ConstrainedPanZoom1D} from "../../transformation/constrained/ConstrainedPanZoom1D";
 import {MainChart} from "./MainChart";
 import {MiniChart} from "./MiniChart";
-import styled from "@emotion/styled";
+import {StyledColumn} from "../../styled/StyledColumn";
 
 export const ChartDemo = () => {
   const canvasWidth = 640;
@@ -16,11 +16,9 @@ export const ChartDemo = () => {
   const [panZoom, updatePanZoom] =
     useState(new ConstrainedPanZoom2D(new ConstrainedPanZoom1D(), new ConstrainedPanZoom1D()))
 
-  const paint = useCallback((canvas: HTMLCanvasElement) => {
-    const context = canvas.getContext("2d")!
-    context.resetTransform()
-
-    drawLines(context, panZoom, chartData.data);
+  const paint = useCallback((ctx: CanvasRenderingContext2D) => {
+    ctx.resetTransform()
+    drawLines(ctx, panZoom, chartData.data);
   }, [panZoom])
 
   return (<>
@@ -42,7 +40,3 @@ export const ChartDemo = () => {
     </StyledColumn>
   </>)
 }
-
-const StyledColumn = styled.div`
-  flex-direction: column;
-`

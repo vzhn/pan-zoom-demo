@@ -5,12 +5,11 @@ import {updateChartConstraints} from "./updateChartConstraints";
 import {ChartData} from "./ChartData";
 
 export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZoom}: {
+  width: number, height: number,
   chartData: ChartData,
-  width: number,
-  height: number,
   panZoom: ConstrainedPanZoom2D,
   updatePanZoom: React.Dispatch<React.SetStateAction<ConstrainedPanZoom2D>>,
-  paint: (canvas: HTMLCanvasElement, data: ChartData) => void
+  paint: (ctx: CanvasRenderingContext2D, data: ChartData) => void
 }) => {
   useEffect(() => {
     updatePanZoom((prevPanZoom) =>
@@ -19,7 +18,8 @@ export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZo
 
   const onDrag = useCallback(({dx, dy}: { dx: number, dy: number }) => {
     updatePanZoom(pz => pz.translateScreen(dx, dy))
-  }, []);
+  }, [updatePanZoom]);
+
   return (<>
     <Demo<ChartData>
       dimensions={{canvasWidth: width, canvasHeight: height}}
@@ -29,7 +29,8 @@ export const MainChart = ({chartData, width, height, panZoom, paint, updatePanZo
       paint={paint}
       onStartDrag={() => true}
       onDrag={onDrag}
-      onWheel={(p, deltaY) => updatePanZoom(panZoom.zoomXAt(p.mx, getZoomFactor(deltaY)))}
+      onWheel={(p, deltaY) =>
+        updatePanZoom(pz => pz.zoomXAt(p.mx, getZoomFactor(deltaY)))}
     />
   </>)
 }
