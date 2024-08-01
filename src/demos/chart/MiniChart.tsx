@@ -5,6 +5,8 @@ import {updateChartConstraints} from "./updateChartConstraints";
 import {ChartData, MiniChartData} from "./ChartData";
 import {drawLines} from "../../misc/Geometry";
 
+const LIGHT_GRAY = '#d3d3d3';
+
 export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPanZoom}: {
   chartData: ChartData,
   width: number,
@@ -37,7 +39,7 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
   const paint = useCallback((ctx: CanvasRenderingContext2D, { leftX, rightX}: MiniChartData) => {
     ctx.resetTransform()
 
-    ctx.fillStyle = '#d3d3d3'
+    ctx.fillStyle = LIGHT_GRAY
     ctx.fillRect(0, 0, leftX, height)
     ctx.fillRect(rightX, 0, width, height)
 
@@ -51,7 +53,7 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
     })
   }, [minichartPanZoom]);
 
-  const dragConstraint = useCallback((x: number) => x >= leftX && x <= rightX, [leftX, rightX])
+  const inDragZone = useCallback((x: number) => x >= leftX && x <= rightX, [leftX, rightX])
 
   return (<>
     <Demo<MiniChartData>
@@ -62,11 +64,11 @@ export const MiniChart = ({chartData, width, height, chartPanZoom, updateChartPa
       paint={paint}
       onDrag={onDrag}
       onWheel={({mx}, deltaY) => {
-        if (dragConstraint(mx)) {
+        if (inDragZone(mx)) {
           updateChartPanZoom(cpz => cpz.zoomXAt(mx, getZoomFactor(deltaY)))
         }
       }}
-      onStartDrag={({mx}) => dragConstraint(mx)}
+      onStartDrag={({mx}) => inDragZone(mx)}
     />
   </>)
 }
