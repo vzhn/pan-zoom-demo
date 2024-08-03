@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect, useRef} from 'react';
 import './App.css';
-import {Point} from "./PanZoom";
 import {StyledCanvas} from "./styled/StyledCanvas";
 import {ConstrainedPanZoom2D} from "./transformation/constrained/ConstrainedPanZoom2D";
+import {Point} from "./misc/Geometry";
 
 export const getZoomFactor = (deltaY: number) => Math.pow(10, deltaY / 2000.0);
 

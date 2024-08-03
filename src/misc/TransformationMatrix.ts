@@ -1,7 +1,4 @@
-export interface Point {
-  mx: number
-  my: number
-}
+import {Point} from "./Geometry";
 
 export class TransformationMatrix implements DOMMatrix2DInit {
   a: number = 1

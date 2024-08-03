@@ -1,5 +1,6 @@
 import {PanZoom1D} from "./PanZoom1D";
-import {Point, TransformationMatrix} from "../PanZoom";
+import {Point} from "../misc/Geometry";
+import {TransformationMatrix} from "../misc/TransformationMatrix";
 
 export class PanZoom2D {
   constructor(

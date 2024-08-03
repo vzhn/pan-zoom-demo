@@ -1,5 +1,10 @@
 import {ConstrainedPanZoom2D} from "../transformation/constrained/ConstrainedPanZoom2D";
 
+export interface Point {
+  mx: number
+  my: number
+}
+
 export const drawDot = (ctx: CanvasRenderingContext2D, x: number, y: number) => {
   let text = ` (${x}, ${y})`;
   const tm = ctx.measureText(text)

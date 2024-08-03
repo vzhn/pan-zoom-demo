@@ -1,5 +1,6 @@
-import {Point, TransformationMatrix} from "../../PanZoom";
 import {ConstrainedPanZoom1D, Constraint, minScale} from "./ConstrainedPanZoom1D";
+import {Point} from "../../misc/Geometry";
+import {TransformationMatrix} from "../../misc/TransformationMatrix";
 
 export class ConstrainedPanZoom2D {
   constructor(
